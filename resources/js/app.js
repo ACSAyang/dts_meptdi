@@ -1,3 +1,9 @@
+
+import DataTable from 'datatables.net-dt';
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+
+window.DataTable = DataTable;
+
 // Mobile sidebar toggle
 const sidebar = document.getElementById('sidebar');
 const backdrop = document.getElementById('sidebar-backdrop');

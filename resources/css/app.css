@@ -1,0 +1,212 @@
+@import 'tailwindcss';
+/* Montserrat is bundled with the app (no internet needed), as in the PCG/MEPTDI template. */
+@import '@fontsource-variable/montserrat';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views';
+
+/*
+ * Philippine Coast Guard palette: PCG navy with PCG orange as the only accent,
+ * and a light grey background, following the official PCG/MEPCOM/MEPTDI template.
+ */
+@theme {
+    --font-sans: 'Montserrat Variable', 'Montserrat', 'Segoe UI', ui-sans-serif, system-ui, Arial, sans-serif;
+    --font-mono: 'Cascadia Mono', 'Consolas', ui-monospace, monospace;
+
+    --color-navy-50: #f1f4f9;
+    --color-navy-100: #e1e7f0;
+    --color-navy-200: #c3cee0;
+    --color-navy-300: #93a5c4;
+    --color-navy-400: #5c76a2;
+    --color-navy-500: #36527f;
+    --color-navy-600: #1f3c69;
+    --color-navy-700: #142f58;
+    --color-navy-800: #0d2449;
+    --color-navy-900: #081a38;
+    --color-navy-950: #040f24;
+
+    /* PCG orange (seal ring / hull stripe) */
+    --color-accent-400: #f08a3e;
+    --color-accent-500: #e8701a;
+    --color-accent-600: #c75a0e;
+    --color-accent-700: #a3480b;
+
+    --color-cream: #f4f5f7;
+
+}
+
+@layer base {
+    body {
+        @apply bg-cream text-slate-800 antialiased;
+    }
+
+    main h1 {
+        @apply font-bold tracking-[0.06em] uppercase;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    /* Thin PCG-orange line under the header band */
+    .pcg-rule {
+        @apply h-[3px] bg-accent-500;
+    }
+
+    .card {
+        @apply rounded-md border border-navy-100 bg-white;
+    }
+
+    .card-header {
+        @apply flex items-center justify-between gap-3 border-b border-navy-100 px-5 py-3.5;
+    }
+
+    .card-title {
+        @apply text-[12px] font-bold tracking-[0.08em] text-navy-900 uppercase;
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center gap-1.5 rounded px-3.5 py-2 text-[13px] font-semibold transition focus:ring-2 focus:ring-accent-500/40 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .btn-primary {
+        @apply bg-navy-800 text-white hover:bg-navy-700;
+    }
+
+    .btn-accent {
+        @apply bg-accent-500 text-white hover:bg-accent-600;
+    }
+
+    .btn-secondary {
+        @apply border border-navy-200 bg-white text-navy-800 hover:bg-navy-50;
+    }
+
+    .btn-danger {
+        @apply border border-red-200 bg-white text-red-700 hover:bg-red-50;
+    }
+
+    .btn-success {
+        @apply bg-emerald-700 text-white hover:bg-emerald-600;
+    }
+
+    .btn-sm {
+        @apply px-2.5 py-1.5 text-xs;
+    }
+
+    .label {
+        @apply mb-1 block text-xs font-semibold tracking-wide text-navy-700 uppercase;
+    }
+
+    .input {
+        @apply block w-full rounded border border-navy-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-none placeholder:text-slate-400 focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20 focus:outline-none;
+    }
+
+    .input-error {
+        @apply mt-1 text-xs text-red-600;
+    }
+
+    .hint {
+        @apply mt-1 text-xs text-slate-500;
+    }
+
+    .table {
+        @apply w-full text-left text-sm;
+    }
+
+    .table thead th {
+        @apply border-b border-navy-100 bg-navy-50 px-4 py-2.5 text-[11px] font-bold tracking-wider whitespace-nowrap text-navy-700 uppercase;
+    }
+
+    .table tbody td {
+        @apply border-b border-navy-50 px-4 py-3 align-top;
+    }
+
+    .table tbody tr:hover td {
+        @apply bg-navy-50/50;
+    }
+
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap;
+    }
+
+    .ref {
+        @apply font-mono text-[13px] font-semibold text-navy-800;
+    }
+
+    .dl dt {
+        @apply text-[11px] font-semibold tracking-wider text-navy-500 uppercase;
+    }
+
+    .dl dd {
+        @apply mt-0.5 mb-3 text-sm text-slate-800;
+    }
+
+    .nav-link {
+        @apply mx-3 flex items-center gap-3 rounded px-3 py-2.5 text-[12.5px] font-medium tracking-wide text-navy-100/75 transition hover:bg-white/[0.06] hover:text-white;
+    }
+
+    .nav-link.active {
+        @apply bg-white/10 font-semibold text-white shadow-[inset_3px_0_0_var(--color-accent-500)];
+    }
+
+}
+
+/* Print-friendly registers and forms */
+@media print {
+    @page {
+        size: A4 landscape;
+        margin: 12mm;
+    }
+
+    body {
+        background: #fff !important;
+        font-size: 11px;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+    }
+
+    .card {
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .table thead th {
+        background: #fff !important;
+        border-bottom: 1.5px solid #000 !important;
+        color: #000 !important;
+    }
+
+    .table tbody td {
+        border-bottom: 0.5px solid #999 !important;
+        padding: 4px 6px !important;
+    }
+
+    a {
+        color: inherit !important;
+        text-decoration: none !important;
+    }
+}
+
+.print-only {
+    display: none;
+}
+
+/* Slim, quiet scrollbar for the sidebar menu */
+.nav-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}

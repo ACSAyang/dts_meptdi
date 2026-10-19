@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="MEPTDI logo placeholder">
+  <circle cx="60" cy="60" r="57" fill="#0c1a33" stroke="#c9a54a" stroke-width="3"/>
+  <circle cx="60" cy="60" r="47" fill="none" stroke="#c9a54a" stroke-width="1" stroke-dasharray="2 3"/>
+  <g fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round">
+    <line x1="60" y1="30" x2="60" y2="86"/>
+    <line x1="48" y1="40" x2="72" y2="40"/>
+    <path d="M36 70 Q60 96 84 70"/>
+    <line x1="36" y1="70" x2="30" y2="64"/>
+    <line x1="84" y1="70" x2="90" y2="64"/>
+  </g>
+  <circle cx="60" cy="27" r="4" fill="none" stroke="#ffffff" stroke-width="3"/>
+  <text x="60" y="108" text-anchor="middle" font-family="Segoe UI, Arial" font-size="9" font-weight="700" fill="#c9a54a" letter-spacing="1.5">MEPTDI</text>
+</svg>

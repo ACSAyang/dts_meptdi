@@ -12,6 +12,8 @@ use App\Http\Controllers\OutgoingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestEmail;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -83,4 +85,24 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/backups/restore-test', [BackupController::class, 'restoreTest'])->name('backups.restore-test');
         Route::get('/backups/download', [BackupController::class, 'download'])->name('backups.download');
     });
+
+    //Email Test Route
+    // // Send a test email
+    // Route::post('/admin/test-email', function (Request $request) {
+    //     $validated = $request->validate([
+    //         'email' => ['required', 'email'],
+    //     ]);
+
+    //     Mail::to($validated['email'])->send(
+    //         new TestEmail(
+    //             username: 'Test User',
+    //             loginUrl: route('login')
+    //         )
+    //     );
+
+    //     return back()->with(
+    //         'success',
+    //         'Test email sent successfully.'
+    //     );
+    // })->name('admin.test-email');
 });

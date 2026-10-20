@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Services\Audit;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\TestEmail;
 
 /** Accounts are never deleted (records stay linked to them); they are deactivated instead. */
 class UserController extends Controller
@@ -21,15 +23,52 @@ class UserController extends Controller
         return view('admin.users.form', ['user' => new User(['is_active' => true])]);
     }
 
+
+
     public function store(Request $request)
     {
-        $data = $request->validate($this->rules() + ['password' => ['required', 'confirmed', 'min:8']]);
+        $data = $request->validate(
+            $this->rules() + [
+                'password' => ['required', 'confirmed', 'min:8'],
+            ]
+        );
+
         $data['is_active'] = $request->boolean('is_active');
 
+        // Create user account
         $user = User::create($data);
-        Audit::log('user.created', $user, 'Created account '.$user->username, null, collect($data)->except('password', 'password_confirmation')->all());
 
-        return redirect()->route('admin.users.index')->with('success', 'Account created for '.$user->displayName().'.');
+        // Record audit log
+        Audit::log(
+            'user.created',
+            $user,
+            'Created account ' . $user->username,
+            null,
+            collect($data)
+                ->except('password', 'password_confirmation')
+                ->all()
+        );
+
+        // Send formal account creation email
+        try {
+            Mail::to($user->email)->send(
+                new TestEmail(
+                    username: $user->username,
+                    loginUrl: route('login')
+                )
+            );
+        } catch (\Throwable $e) {
+            // Log email errors without cancelling account creation
+            report($e);
+        }
+
+        // Redirect after account creation
+        return redirect()
+            ->route('admin.users.index')
+            ->with(
+                'success',
+                'Account created for ' . $user->displayName() . '.'
+            );
     }
 
     public function edit(User $user)
@@ -55,7 +94,7 @@ class UserController extends Controller
         $passwordChanged = $user->isDirty('password');
         $user->save();
 
-        Audit::log('user.updated', $user, 'Updated account '.$user->username.($passwordChanged ? ' (password reset)' : ''), $old, $changes);
+        Audit::log('user.updated', $user, 'Updated account ' . $user->username . ($passwordChanged ? ' (password reset)' : ''), $old, $changes);
 
         return redirect()->route('admin.users.index')->with('success', 'Account updated.');
     }
@@ -63,9 +102,9 @@ class UserController extends Controller
     private function rules(?User $user = null): array
     {
         return [
-            'rank' => ['nullable', 'string', 'max:50'],
+            'rank' => ['required', 'string', 'max:50'],
             'name' => ['required', 'string', 'max:255'],
-            'serial_number' => ['nullable', 'string', 'max:50'],
+            'serial_number' => ['required', 'string', 'max:50'],
             'designation' => ['nullable', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:50', 'alpha_dash', Rule::unique('users')->ignore($user)],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('users')->ignore($user)],

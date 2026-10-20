@@ -14,10 +14,34 @@ use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\TestEmail;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
+});
+
+Route::middleware('guest')->group(function () {
+    Route::get('/forgot-password', [
+        PasswordResetLinkController::class,
+        'create'
+    ])->name('password.request');
+
+    Route::post('/forgot-password', [
+        PasswordResetLinkController::class,
+        'store'
+    ])->name('password.email');
+
+    Route::get('/reset-password/{token}', [
+        NewPasswordController::class,
+        'create'
+    ])->name('password.reset');
+
+    Route::post('/reset-password', [
+        NewPasswordController::class,
+        'store'
+    ])->name('password.update');
 });
 
 // One user level: every signed-in, active account can use every part of the system.

@@ -7,8 +7,8 @@
             <p class="text-sm text-slate-500">{{ now()->format('l, d F Y') }}</p>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('incoming.create') }}" class="btn btn-accent"><x-icon name="inbox" /> Register incoming</a>
-            <a href="{{ route('outgoing.create') }}" class="btn btn-primary"><x-icon name="send" /> Register outgoing</a>
+            <a href="{{ route('incoming.create') }}" data-modal-open="modal-incoming" class="btn btn-accent"><x-icon name="inbox" /> Register incoming</a>
+            <a href="{{ route('outgoing.create') }}" data-modal-open="modal-outgoing" class="btn btn-primary"><x-icon name="send" /> Register outgoing</a>
         </div>
     </div>
 

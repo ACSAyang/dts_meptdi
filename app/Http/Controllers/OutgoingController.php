@@ -7,25 +7,45 @@ use App\Services\Audit;
 use App\Services\Duty;
 use App\Services\ReferenceNumber;
 use App\Services\Tracker;
+use App\Support\DataTableResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class OutgoingController extends Controller
 {
+    /** Register page; the table itself is filled by the DataTables request (see rows()). */
     public function index(Request $request)
     {
-        $records = OutgoingCommunication::query()
-            ->search($request->input('q'))
+        if ($request->has('draw')) {
+            return $this->rows($request);
+        }
+
+        return view('outgoing.index');
+    }
+
+    private function rows(Request $request)
+    {
+        $query = OutgoingCommunication::query()
             ->when($request->input('status') === 'pending', fn ($q) => $q->pending())
             ->when($request->input('status') && $request->input('status') !== 'pending', fn ($q) => $q->where('status', $request->input('status')))
             ->when($request->input('from'), fn ($q, $d) => $q->whereDate('created_at', '>=', $d))
-            ->when($request->input('to'), fn ($q, $d) => $q->whereDate('created_at', '<=', $d))
-            ->with('registrar')
-            ->latest('id')
-            ->paginate(25)->withQueryString();
+            ->when($request->input('to'), fn ($q, $d) => $q->whereDate('created_at', '<=', $d));
 
-        return view('outgoing.index', compact('records'));
+        return DataTableResponse::make(
+            $request,
+            $query,
+            [0 => 'reference_no', 1 => 'created_at', 2 => 'destination_office', 3 => 'subject', 4 => 'liaison_name', 5 => 'status'],
+            fn ($q, $term) => $q->search($term),
+            function (OutgoingCommunication $r) {
+                $view = view('outgoing._row', ['r' => $r]);
+
+                return [
+                    'cells' => array_map(fn ($cell) => $view->fragment($cell), ['reference', 'registered', 'destination', 'subject', 'liaison', 'status']),
+                    'href' => route('outgoing.show', $r),
+                ];
+            },
+        );
     }
 
     public function create()
@@ -38,7 +58,7 @@ class OutgoingController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate($this->rules() + $this->attachmentRules());
+        $data = $request->validateWithBag('outgoing', $this->rules() + $this->attachmentRules());
         $user = $request->user();
 
         $record = DB::transaction(function () use ($data, $user, $request) {

@@ -1,9 +1,6 @@
 <x-layouts.app title="Delivery Report">
 
-    {{-- External library styles --}}
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.css">
+    {{-- DataTables, Chart.js and FullCalendar are bundled in resources/js/app.js (works offline). --}}
 
     <style>
         .report-panel {
@@ -342,10 +339,7 @@
         @include('reports.partials.signatures')
     </div>
 
-    {{-- Load libraries directly in this view --}}
-    <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.19/index.global.min.js"></script>
+    {{-- window.DataTable, window.Chart and window.FullCalendar come from the app bundle (resources/js/app.js). --}}
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

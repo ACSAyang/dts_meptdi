@@ -1,8 +1,11 @@
-import DataTable from 'datatables.net-dt';
-import 'datatables.net-dt/css';
+import Chart from 'chart.js/auto';
+import { initDataTables } from './modules/datatables';
+import { initModals } from './modules/modals';
+import { initTrackingCalendar } from './modules/calendar';
+import { initForms } from './modules/forms';
 
-window.DataTable = DataTable;
-
+// Libraries are bundled with the app (no internet needed on the office network).
+window.Chart = Chart;
 
 // Mobile sidebar toggle
 const sidebar = document.getElementById('sidebar');
@@ -30,20 +33,7 @@ if (clock) {
     setInterval(tick, 30000);
 }
 
-// Show/hide blocks driven by a checkbox: <input data-toggle="#target">
-document.querySelectorAll('[data-toggle]').forEach((input) => {
-    const target = document.querySelector(input.dataset.toggle);
-    const sync = () => target?.classList.toggle('hidden', !input.checked);
-    input.addEventListener('change', sync);
-    sync();
-});
-
-// Confirmation prompts on irreversible actions: <form data-confirm="...">
-document.querySelectorAll('form[data-confirm]').forEach((form) => {
-    form.addEventListener('submit', (e) => {
-        if (!window.confirm(form.dataset.confirm)) e.preventDefault();
-    });
-});
-
-// Print button
-document.querySelectorAll('[data-print]').forEach((btn) => btn.addEventListener('click', () => window.print()));
+initForms();
+initModals();
+initDataTables();
+initTrackingCalendar();

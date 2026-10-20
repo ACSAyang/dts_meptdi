@@ -18,6 +18,11 @@
         "@laravel/multiplex": "^0.4.1"
     },
     "dependencies": {
+        "@fullcalendar/core": "^6.1.22",
+        "@fullcalendar/daygrid": "^6.1.22",
+        "@fullcalendar/interaction": "^6.1.22",
+        "@fullcalendar/list": "^6.1.22",
+        "chart.js": "^4.5.1",
         "datatables.net": "^3.1.4",
         "datatables.net-dt": "^3.1.4"
     }

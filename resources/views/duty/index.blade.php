@@ -61,15 +61,15 @@
             <div class="card">
                 <div class="card-header"><h2 class="card-title">Duty history</h2></div>
                 <div class="overflow-x-auto">
-                    <table class="table">
+                    <table class="table" data-datatable data-order='[[1,"desc"]]' data-page-length="15" data-empty="No duty periods yet.">
                         <thead><tr><th>Watch</th><th>Started</th><th>Ended</th><th>Turned over to</th><th></th></tr></thead>
                         <tbody>
-                        @forelse ($history as $period)
+                        @foreach ($history as $period)
                             <tr>
                                 <td class="font-medium text-navy-900">{{ $period->user->displayName() }}
                                     @if ($period->status === 'active')<span class="badge ml-1 bg-emerald-50 text-emerald-700">On duty</span>@endif
                                 </td>
-                                <td class="text-xs whitespace-nowrap">{{ $period->started_at?->format('d M Y H:i') ?? '—' }}</td>
+                                <td class="text-xs whitespace-nowrap" data-order="{{ $period->started_at?->timestamp ?? 0 }}">{{ $period->started_at?->format('d M Y H:i') ?? '—' }}</td>
                                 <td class="text-xs whitespace-nowrap">{{ $period->ended_at?->format('d M Y H:i') ?? '—' }}</td>
                                 <td class="text-xs">
                                     @if ($period->turnoverGiven)
@@ -78,13 +78,10 @@
                                 </td>
                                 <td class="text-right"><a href="{{ route('duty.show', $period) }}" class="text-xs font-semibold text-accent-600 hover:underline">View log</a></td>
                             </tr>
-                        @empty
-                            <tr><td colspan="5" class="py-8 text-center text-slate-400">No duty periods yet.</td></tr>
-                        @endforelse
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
-                @if ($history->hasPages())<div class="border-t border-navy-50 px-5 py-3">{{ $history->links() }}</div>@endif
             </div>
         </div>
 

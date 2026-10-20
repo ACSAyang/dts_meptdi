@@ -17,6 +17,7 @@
         ['incoming.index', 'Incoming', 'inbox', 'incoming.*'],
         ['outgoing.index', 'Outgoing', 'send', 'outgoing.*'],
         ['duty.index', 'Duty Office Watch', 'shield', 'duty.*'],
+        ['calendar.index', 'Tracking Calendar', 'calendar', 'calendar.*'],
         ['reports.index', 'Reports', 'report', 'reports.*'],
         ['search', 'Search Records', 'search', 'search'],
     ];
@@ -35,6 +36,7 @@
             <div class="leading-tight">
                 <div class="text-[15px] font-bold tracking-[0.15em]">MEPTDI</div>
                 <div class="text-[11px] text-navy-200">Document Tracking System</div>
+                <div class="mt-1 inline-block rounded bg-white/10 px-1.5 py-px text-[9.5px] font-semibold tracking-wider text-navy-100">v{{ config('dts.version') }}</div>
             </div>
         </div>
 
@@ -71,7 +73,14 @@
         <header class="no-print sticky top-0 z-20 bg-white">
             <div class="flex h-14 items-center gap-3 px-4 lg:px-8">
                 <button id="sidebar-toggle" class="-ml-1 rounded p-1.5 text-navy-800 hover:bg-navy-50 lg:hidden" aria-label="Open menu"><x-icon name="menu" class="size-5" /></button>
-                <div class="min-w-0 flex-1 truncate text-[11px] font-semibold tracking-[0.1em] text-navy-600 uppercase">PCG · MEPCOM · MEPTDI</div>
+                <div class="flex min-w-0 flex-1 items-center gap-2">
+                    <x-logo unit="pcg" class="size-8 shrink-0" />
+                    <x-logo unit="mepcom" class="size-8 shrink-0" />
+                    <div class="ml-1 min-w-0 truncate leading-tight">
+                        <div class="truncate text-[11px] font-bold tracking-[0.1em] text-navy-900 uppercase">{{ config('dts.service') }}</div>
+                        <div class="hidden truncate text-[10px] font-medium tracking-[0.06em] text-navy-500 uppercase sm:block">{{ config('dts.parent_command') }}</div>
+                    </div>
+                </div>
                 <a href="{{ route('duty.index') }}" class="hidden items-center gap-2 rounded-full border px-3 py-1 text-xs sm:inline-flex {{ $onDuty ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-accent-400/60 bg-accent-500/10 text-accent-700' }}">
                     <span class="size-1.5 rounded-full {{ $onDuty ? 'bg-emerald-500' : 'bg-accent-500' }}"></span>
                     @if ($onDuty)
@@ -105,11 +114,13 @@
 
         <footer class="no-print">
             <div class="mx-4 flex flex-wrap items-center justify-between gap-2 border-t border-navy-100 py-4 text-[11px] text-slate-500 lg:mx-8">
-                <span>{{ config('dts.office_name') }}</span>
+                <span>{{ config('dts.office_name') }} · {{ config('dts.system_name') }} · Version {{ config('dts.version') }}</span>
                 <span class="font-semibold tracking-wider uppercase">For official use only</span>
             </div>
         </footer>
     </div>
 </div>
+
+<x-register-modals />
 </body>
 </html>

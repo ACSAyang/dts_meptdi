@@ -205,6 +205,219 @@
     display: none;
 }
 
+/* ---------------------------------------------------------------------------
+ * DataTables, in the system's navy/orange style
+ * ------------------------------------------------------------------------- */
+div.dt-container {
+    font-size: 13px;
+    color: var(--color-slate-700);
+}
+
+div.dt-container .dt-layout-row {
+    margin: 0 0 0.75rem;
+}
+
+div.dt-container .dt-layout-row:last-child {
+    margin: 0.75rem 0 0;
+}
+
+div.dt-container .dt-search input,
+div.dt-container .dt-length select {
+    border: 1px solid var(--color-navy-200);
+    border-radius: 0.25rem;
+    background: #fff;
+    padding: 0.45rem 0.75rem;
+    font-size: 13px;
+    color: var(--color-slate-800);
+    outline: none;
+}
+
+div.dt-container .dt-search input {
+    width: min(22rem, 70vw);
+    margin-left: 0;
+}
+
+div.dt-container .dt-search input:focus,
+div.dt-container .dt-length select:focus {
+    border-color: var(--color-accent-500);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent-500) 20%, transparent);
+}
+
+div.dt-container .dt-length select {
+    margin-right: 0.4rem;
+}
+
+div.dt-container .dt-info {
+    color: var(--color-slate-500);
+    font-size: 12px;
+}
+
+div.dt-container .dt-paging .dt-paging-button {
+    border: 1px solid transparent !important;
+    border-radius: 0.25rem;
+    padding: 0.3rem 0.7rem !important;
+    color: var(--color-navy-700) !important;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+div.dt-container .dt-paging .dt-paging-button:hover {
+    background: var(--color-navy-50) !important;
+    border-color: var(--color-navy-100) !important;
+    color: var(--color-navy-900) !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button.current,
+div.dt-container .dt-paging .dt-paging-button.current:hover {
+    background: var(--color-navy-800) !important;
+    border-color: var(--color-navy-800) !important;
+    color: #fff !important;
+}
+
+div.dt-container .dt-paging .dt-paging-button.disabled,
+div.dt-container .dt-paging .dt-paging-button.disabled:hover {
+    background: transparent !important;
+    border-color: transparent !important;
+    color: var(--color-slate-300) !important;
+}
+
+table.dataTable.table > thead > tr > th {
+    border-bottom: 1px solid var(--color-navy-100);
+}
+
+table.dataTable > tbody > tr[data-href] {
+    cursor: pointer;
+}
+
+table.dataTable.table > tbody > tr:hover > td {
+    background: color-mix(in oklab, var(--color-navy-50) 70%, transparent);
+}
+
+table.dataTable td.dt-empty {
+    padding: 2.5rem 1rem !important;
+    color: var(--color-slate-400);
+    text-align: center;
+}
+
+div.dt-container div.dt-processing {
+    border: 1px solid var(--color-navy-100);
+    border-radius: 0.375rem;
+    background: #fff;
+    box-shadow: 0 6px 18px -8px rgba(8, 26, 56, 0.25);
+    color: var(--color-navy-800);
+    font-weight: 600;
+}
+
+div.dt-container div.dt-processing > div:last-child > div {
+    background: var(--color-accent-500);
+}
+
+/* ---------------------------------------------------------------------------
+ * Pop-up windows (<dialog>)
+ * ------------------------------------------------------------------------- */
+dialog.modal[open] {
+    animation: modal-in 160ms ease-out;
+}
+
+dialog.modal::backdrop {
+    animation: backdrop-in 160ms ease-out;
+}
+
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.985); }
+    to { opacity: 1; transform: none; }
+}
+
+@keyframes backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------------------
+ * FullCalendar (tracking calendar)
+ * ------------------------------------------------------------------------- */
+.fc {
+    --fc-border-color: var(--color-navy-100);
+    --fc-today-bg-color: color-mix(in oklab, var(--color-accent-500) 8%, transparent);
+    --fc-button-bg-color: #fff;
+    --fc-button-border-color: var(--color-navy-200);
+    --fc-button-text-color: var(--color-navy-800);
+    --fc-button-hover-bg-color: var(--color-navy-50);
+    --fc-button-hover-border-color: var(--color-navy-300);
+    --fc-button-active-bg-color: var(--color-navy-800);
+    --fc-button-active-border-color: var(--color-navy-800);
+    --fc-event-border-color: transparent;
+    --fc-page-bg-color: #fff;
+    --fc-neutral-bg-color: var(--color-navy-50);
+    --fc-list-event-hover-bg-color: var(--color-navy-50);
+    font-size: 12.5px;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-navy-900);
+}
+
+.fc .fc-button {
+    font-size: 12.5px;
+    font-weight: 600;
+    text-transform: none;
+    box-shadow: none !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    color: #fff;
+}
+
+.fc .fc-col-header-cell-cushion {
+    padding: 6px 4px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-navy-600);
+}
+
+.fc .fc-daygrid-day-number {
+    font-weight: 600;
+    color: var(--color-navy-700);
+}
+
+.fc .fc-daygrid-day:hover {
+    background: color-mix(in oklab, var(--color-navy-50) 60%, transparent);
+    cursor: pointer;
+}
+
+.fc .fc-daygrid-event {
+    margin-top: 2px;
+    border-radius: 3px;
+    padding: 1px 3px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.fc .fc-daygrid-dot-event .fc-event-title {
+    font-weight: 600;
+}
+
+.fc .fc-daygrid-more-link {
+    font-weight: 600;
+    color: var(--color-accent-600);
+}
+
+@media print {
+    div.dt-container .dt-layout-row:first-child,
+    div.dt-container .dt-paging,
+    div.dt-container .dt-length,
+    div.dt-container .dt-search {
+        display: none !important;
+    }
+}
+
 /* Slim, quiet scrollbar for the sidebar menu */
 .nav-scroll {
     scrollbar-width: thin;

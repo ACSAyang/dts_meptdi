@@ -21,7 +21,7 @@ class DutyController extends Controller
             'awaitingTurnover' => DutyTurnover::awaitingAcknowledgment(),
             'history' => DutyPeriod::with(['user', 'turnoverGiven.toUser'])
                 ->whereIn('status', [DutyPeriod::ACTIVE, DutyPeriod::COMPLETED])
-                ->latest('started_at')->paginate(15),
+                ->latest('started_at')->limit(1000)->get(),
         ]);
     }
 

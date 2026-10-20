@@ -11,7 +11,41 @@ return [
     'parent_command' => 'Marine Environmental Protection Command',
     'service' => 'Philippine Coast Guard',
     'system_name' => 'Communications and Document Tracking System',
+    'version' => '1.0',
     'reference_padding' => 4,
+
+    /*
+    | Philippine Coast Guard ranks, lowest (ASN) to highest (ADM).
+    | The abbreviation is stored and printed; the title is shown in the dropdown.
+    */
+    'ranks' => [
+        'Enlisted Personnel' => [
+            'ASN' => 'Apprentice Seaman',
+            'SN2' => 'Seaman Second Class',
+            'SN1' => 'Seaman First Class',
+            'PO3' => 'Petty Officer Third Class',
+            'PO2' => 'Petty Officer Second Class',
+            'PO1' => 'Petty Officer First Class',
+            'CPO' => 'Chief Petty Officer',
+            'SCPO' => 'Senior Chief Petty Officer',
+            'MCPO' => 'Master Chief Petty Officer',
+        ],
+        'Officers' => [
+            'ENS' => 'Ensign',
+            'LTJG' => 'Lieutenant Junior Grade',
+            'LT' => 'Lieutenant',
+            'LCDR' => 'Lieutenant Commander',
+            'CDR' => 'Commander',
+            'CAPT' => 'Captain',
+            'COMMO' => 'Commodore',
+            'RADM' => 'Rear Admiral',
+            'VADM' => 'Vice Admiral',
+            'ADM' => 'Admiral',
+        ],
+    ],
+
+    /* Suffix printed after the name of uniformed personnel, e.g. "ASN Juan A Dela Cruz PCG". */
+    'name_suffix' => 'PCG',
 
     /*
     | Official seals (transparent PNGs cropped from the approved artwork).

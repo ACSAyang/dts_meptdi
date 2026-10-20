@@ -20,10 +20,10 @@
     <div class="card mb-6 overflow-hidden">
         <div class="card-header"><h2 class="card-title">Incoming ({{ $incoming->count() }})</h2></div>
         <div class="overflow-x-auto">
-            <table class="table">
+            <table class="table" data-datatable data-paging="false" data-order='[[1,"asc"]]' data-empty="No incoming communications.">
                 <thead><tr><th>Reference</th><th>Time</th><th>Sender</th><th>Type</th><th>Subject</th><th>Routed to</th><th>Received by</th><th>Status</th></tr></thead>
                 <tbody>
-                @forelse ($incoming as $r)
+                @foreach ($incoming as $r)
                     <tr>
                         <td class="ref whitespace-nowrap">{{ $r->reference_no }}</td>
                         <td class="text-xs">{{ $r->received_at->format('H:i') }}H</td>
@@ -34,9 +34,7 @@
                         <td class="text-xs">{{ $r->registrar->displayName() }}</td>
                         <td class="text-xs">{{ $r->statusLabel() }}</td>
                     </tr>
-                @empty
-                    <tr><td colspan="8" class="py-6 text-center text-slate-400">No incoming communications.</td></tr>
-                @endforelse
+                @endforeach
                 </tbody>
             </table>
         </div>
@@ -45,10 +43,10 @@
     <div class="card overflow-hidden print:break-before-page">
         <div class="card-header"><h2 class="card-title">Outgoing ({{ $outgoing->count() }})</h2></div>
         <div class="overflow-x-auto">
-            <table class="table">
+            <table class="table" data-datatable data-paging="false" data-order='[[1,"asc"]]' data-empty="No outgoing communications.">
                 <thead><tr><th>Reference</th><th>Time</th><th>Destination</th><th>Type</th><th>Subject</th><th>Liaison</th><th>Received by</th><th>Status</th></tr></thead>
                 <tbody>
-                @forelse ($outgoing as $r)
+                @foreach ($outgoing as $r)
                     <tr>
                         <td class="ref whitespace-nowrap">{{ $r->reference_no }}</td>
                         <td class="text-xs">{{ $r->created_at->format('H:i') }}H</td>
@@ -59,9 +57,7 @@
                         <td class="text-xs">{{ $r->received_by_name }}@if ($r->received_at)<br>{{ $r->received_at->format('d M H:i') }}H @endif</td>
                         <td class="text-xs">{{ $r->statusLabel() }}</td>
                     </tr>
-                @empty
-                    <tr><td colspan="8" class="py-6 text-center text-slate-400">No outgoing communications.</td></tr>
-                @endforelse
+                @endforeach
                 </tbody>
             </table>
         </div>

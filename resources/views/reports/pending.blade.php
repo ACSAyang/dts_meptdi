@@ -8,13 +8,13 @@
 
     <div class="card overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="table">
+            <table class="table" data-datatable data-paging="false" data-empty="No pending actions.">
                 <thead><tr><th>Reference</th><th>Received</th><th>Sender</th><th>Subject</th><th>Action required</th><th>Routed to</th><th>Due</th><th>Status</th><th>Age</th></tr></thead>
                 <tbody>
-                @forelse ($incoming as $r)
+                @foreach ($incoming as $r)
                     <tr>
                         <td class="whitespace-nowrap"><a href="{{ route('incoming.show', $r) }}" class="ref hover:underline">{{ $r->reference_no }}</a></td>
-                        <td class="text-xs whitespace-nowrap">{{ $r->received_at->format('d M Y H:i') }}</td>
+                        <td class="text-xs whitespace-nowrap" data-order="{{ $r->received_at->timestamp }}">{{ $r->received_at->format('d M Y H:i') }}</td>
                         <td class="text-xs">{{ $r->sender_name }}</td>
                         <td class="text-xs">{{ \Illuminate\Support\Str::limit($r->subject, 90) }}</td>
                         <td class="text-xs">{{ \Illuminate\Support\Str::limit($r->action_required, 70) }}</td>
@@ -23,9 +23,7 @@
                         <td class="text-xs whitespace-nowrap">{{ $r->statusLabel() }}{{ $r->isOverdue() ? ' · OVERDUE' : '' }}</td>
                         <td class="text-xs whitespace-nowrap">{{ (int) $r->received_at->diffInDays(now()) }} d</td>
                     </tr>
-                @empty
-                    <tr><td colspan="9" class="py-8 text-center text-slate-400">No pending actions.</td></tr>
-                @endforelse
+                @endforeach
                 </tbody>
             </table>
         </div>

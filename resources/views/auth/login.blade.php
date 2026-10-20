@@ -31,7 +31,7 @@
             </div>
 
             <p class="text-[11px] tracking-wide text-navy-400">© {{ now()->year }} {{ config('dts.office_code') }} ·
-                For official use only</p>
+                Version {{ config('dts.version') }} · For official use only</p>
         </section>
 
         {{-- Sign-in --}}
@@ -54,6 +54,10 @@
                     <h2 class="text-2xl font-bold text-navy-900">Welcome</h2>
                     <p class="mt-1.5 text-sm text-slate-500">Sign in with the account issued by the system
                         administrator.</p>
+
+                    @if (session('status'))
+                        <p class="mt-5 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ session('status') }}</p>
+                    @endif
 
                     <form method="POST" action="{{ route('login') }}" class="mt-8 space-y-5">
                         @csrf
@@ -91,6 +95,7 @@
 
                 <p class="mt-8 text-center text-[11px] leading-relaxed text-slate-400">
                     Authorized personnel only. All activity is recorded in the audit trail.
+                    <span class="lg:hidden"><br>Version {{ config('dts.version') }}</span>
                 </p>
             </div>
         </section>

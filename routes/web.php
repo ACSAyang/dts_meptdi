@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DutyController;
 use App\Http\Controllers\IncomingController;
@@ -41,7 +42,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/reset-password', [
         NewPasswordController::class,
         'store'
-    ])->name('password.update');
+    ])->name('password.update_user');
 });
 
 // One user level: every signed-in, active account can use every part of the system.
@@ -52,6 +53,10 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::get('/', DashboardController::class)->name('dashboard');
     Route::get('/search', SearchController::class)->name('search');
+
+    // Document tracking calendar
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar.index');
+    Route::get('/calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
 
     // Duty Office Watch
     Route::get('/duty', [DutyController::class, 'index'])->name('duty.index');

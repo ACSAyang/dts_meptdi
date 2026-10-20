@@ -6,7 +6,11 @@
     ];
 @endphp
 <div class="card">
-    <div class="card-header"><h2 class="card-title">Tracking history</h2></div>
+    <div class="card-header">
+        <h2 class="card-title">Tracking history</h2>
+        <a href="{{ route('calendar.index', ['ref' => $record->reference_no, 'date' => $record->events->first()?->occurred_at?->toDateString()]) }}"
+           class="no-print inline-flex items-center gap-1 text-xs font-semibold text-accent-600 hover:underline"><x-icon name="calendar" class="size-3.5" /> View on calendar</a>
+    </div>
     <ol class="relative space-y-5 px-5 py-5">
         @foreach ($record->events as $event)
             <li class="relative flex gap-3">

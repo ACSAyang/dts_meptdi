@@ -80,20 +80,91 @@ class WorkflowTest extends TestCase
     {
         $this->startDuty($this->watch1);
         foreach (['dashboard', 'incoming.index', 'outgoing.index', 'duty.index', 'reports.index',
-            'admin.users.index', 'admin.audit.index', 'admin.backups.index', 'incoming.create', 'outgoing.create'] as $route) {
+            'admin.users.index', 'admin.audit.index', 'admin.backups.index', 'incoming.create', 'outgoing.create', 'calendar.index'] as $route) {
             $this->actingAs($this->watch2)->get(route($route))->assertOk();
         }
     }
 
-    public function test_any_user_creates_account_with_serial_number(): void
+    public function test_any_user_creates_account_with_rank_split_name_and_pcg_suffix(): void
     {
         $this->actingAs($this->watch1)->post(route('admin.users.store'), [
-            'rank' => 'SN1', 'name' => 'Juan Cruz', 'serial_number' => '2-1234', 'username' => 'jcruz',
+            'rank' => 'ASN', 'first_name' => 'Ian Russel', 'middle_initial' => 'u.', 'last_name' => 'Pascual',
+            'serial_number' => '2-1234', 'username' => 'ipascual', 'email' => '',
             'is_active' => 1, 'password' => 'Secret@1234', 'password_confirmation' => 'Secret@1234',
-        ])->assertSessionHasNoErrors();
+        ])->assertSessionHasNoErrorsIn('user');
 
-        $this->assertDatabaseHas('users', ['username' => 'jcruz', 'serial_number' => '2-1234']);
-        $this->actingAs($this->watch1)->get(route('admin.users.index'))->assertSee('Serial no.')->assertSee('2-1234');
+        $user = User::where('username', 'ipascual')->firstOrFail();
+        $this->assertSame('U', $user->middle_initial);
+        $this->assertSame('Ian Russel U Pascual', $user->name);
+        $this->assertSame('ASN Ian Russel U Pascual PCG', $user->displayName());
+        $this->actingAs($this->watch1)->get(route('admin.users.index'))
+            ->assertSee('ASN Ian Russel U Pascual PCG')->assertSee('2-1234')->assertSee('modal-user');
+    }
+
+    public function test_rank_must_be_a_pcg_rank_and_errors_reopen_the_add_user_popup(): void
+    {
+        $this->actingAs($this->watch1)->from(route('admin.users.index'))->post(route('admin.users.store'), [
+            'rank' => 'GENERAL', 'first_name' => 'Juan', 'last_name' => 'Cruz', 'serial_number' => '1',
+            'username' => 'jc', 'password' => 'Secret@1234', 'password_confirmation' => 'Secret@1234',
+        ])->assertRedirect(route('admin.users.index'))->assertSessionHasErrorsIn('user', 'rank');
+
+        $this->assertSame(['ASN', 'SN2', 'SN1'], array_slice(array_keys(User::ranks()), 0, 3));
+        $this->assertSame('ADM', array_key_last(User::ranks()));
+        $this->actingAs($this->watch1)->get(route('admin.users.index'))->assertSee('data-auto-open', false);
+    }
+
+    public function test_registers_load_through_datatables_and_registration_popups_are_on_every_page(): void
+    {
+        $this->startDuty($this->watch1);
+        $this->actingAs($this->watch1)->post(route('incoming.store'), $this->incomingPayload());
+        $this->actingAs($this->watch1)->post(route('outgoing.store'), $this->outgoingPayload());
+
+        $this->actingAs($this->watch1)->get(route('dashboard'))
+            ->assertSee('id="modal-incoming"', false)->assertSee('id="modal-outgoing"', false)->assertSee('Version 1.0');
+
+        foreach (['incoming.index' => 'Request for training slots', 'outgoing.index' => 'Submission of training report'] as $route => $subject) {
+            $json = $this->actingAs($this->watch1)->getJson(route($route, ['draw' => 3, 'start' => 0, 'length' => 10, 'search' => ['value' => 'train']]))
+                ->assertOk()->json();
+            $this->assertSame(3, $json['draw']);
+            $this->assertSame(1, $json['recordsFiltered']);
+            $this->assertStringContainsString($subject, $json['data'][0]['3']);
+            $this->assertArrayHasKey('data-href', $json['data'][0]['DT_RowAttr']);
+        }
+
+        $none = $this->actingAs($this->watch1)->getJson(route('incoming.index', ['draw' => 1, 'search' => ['value' => 'zzz-no-match']]))->json();
+        $this->assertSame(0, $none['recordsFiltered']);
+        $this->actingAs($this->watch1)->getJson(route('admin.audit.index', ['draw' => 1, 'length' => 5]))->assertOk()->assertJsonPath('draw', 1);
+    }
+
+    public function test_tracking_calendar_lists_every_tracking_step(): void
+    {
+        $this->startDuty($this->watch1);
+        $this->actingAs($this->watch1)->post(route('incoming.store'), $this->incomingPayload());
+        $record = IncomingCommunication::firstOrFail();
+        $this->post(route('incoming.route', $record), ['routed_to' => 'Training Division']);
+
+        $this->get(route('calendar.index'))->assertOk()->assertSee('data-tracking-calendar', false);
+
+        $range = ['start' => now()->subMonth()->toDateString(), 'end' => now()->addMonth()->toDateString()];
+        $events = $this->getJson(route('calendar.events', $range))->assertOk()->json();
+        $this->assertSame(['Registered', 'Routed for action'], array_column(array_column($events, 'extendedProps'), 'step'));
+        $this->assertSame(route('incoming.show', $record), $events[0]['url']);
+
+        $this->assertCount(0, $this->getJson(route('calendar.events', $range + ['type' => 'outgoing']))->json());
+        $this->assertCount(1, $this->getJson(route('calendar.events', $range + ['step' => 'routed']))->json());
+        $this->assertCount(0, $this->getJson(route('calendar.events', $range + ['ref' => 'OUT-']))->json());
+    }
+
+    public function test_sample_data_seeder_adds_ten_of_each_once(): void
+    {
+        $this->seed(\Database\Seeders\SampleDataSeeder::class);
+        $this->seed(\Database\Seeders\SampleDataSeeder::class);
+
+        $this->assertSame(10, IncomingCommunication::count());
+        $this->assertSame(10, OutgoingCommunication::count());
+        $this->assertSame(5, IncomingCommunication::distinct()->count('status')); // registered, routed, in action, closed, cancelled
+        $this->assertTrue(IncomingCommunication::all()->every(fn ($r) => $r->events()->exists()));
+        $this->assertFalse(IncomingCommunication::where('received_at', '>', now())->exists());
     }
 
     public function test_someone_must_be_on_duty_before_recording(): void

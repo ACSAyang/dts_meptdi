@@ -1,61 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
+<x-layouts.guest title="Reset Password">
+    <h1 class="text-2xl font-bold text-navy-900">Set a new password</h1>
+    <p class="mt-1.5 text-sm text-slate-500">Choose a new password for your account.</p>
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Reset Password · MEPTDI DTS</title>
-    @vite(['resources/css/app.css'])
-</head>
+    <form method="POST" action="{{ route('password.update_user') }}" class="mt-7 space-y-5">
+        @csrf
+        <input type="hidden" name="token" value="{{ $token }}">
 
-<body class="min-h-screen bg-cream flex items-center justify-center px-6 py-12">
-    <main class="w-full max-w-md rounded-lg bg-white p-8 shadow-lg">
-        <h1 class="text-2xl font-bold text-navy-900">
-            Set New Password
-        </h1>
+        <x-field label="Registered e-mail" name="email" type="email" :value="old('email', $request->email)" required readonly />
+        <x-field label="New password" name="password" type="password" required autocomplete="new-password" hint="At least 8 characters." />
+        <x-field label="Confirm new password" name="password_confirmation" type="password" required autocomplete="new-password" />
 
-        <p class="mt-2 text-sm text-slate-500">
-            Choose a new password for your account.
-        </p>
+        <button type="submit" class="btn btn-primary w-full py-3">Reset password</button>
+    </form>
 
-        @if ($errors->any())
-            <div class="mt-5 text-sm text-red-600">
-                @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                @endforeach
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('password.update') }}" class="mt-6 space-y-5">
-            @csrf
-
-            <input type="hidden" name="token" value="{{ $token }}">
-
-            <div>
-                <label for="email" class="label">Email address</label>
-                <input id="email" name="email" type="email" value="{{ old('email', $request->email) }}"
-                    class="input px-3.5 py-2.5" autocomplete="email" readonly>
-            </div>
-
-            <div>
-                <label for="password" class="label">New password</label>
-                <input id="password" name="password" type="password" class="input px-3.5 py-2.5"
-                    autocomplete="new-password" required>
-            </div>
-
-            <div>
-                <label for="password_confirmation" class="label">
-                    Confirm new password
-                </label>
-                <input id="password_confirmation" name="password_confirmation" type="password"
-                    class="input px-3.5 py-2.5" autocomplete="new-password" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-full py-3">
-                Reset Password
-            </button>
-        </form>
-    </main>
-</body>
-
-</html>
+    <p class="mt-6 text-center text-sm"><a href="{{ route('login') }}" class="font-semibold text-navy-700 hover:underline">Back to sign in</a></p>
+</x-layouts.guest>

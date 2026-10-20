@@ -7,27 +7,47 @@ use App\Services\Audit;
 use App\Services\Duty;
 use App\Services\ReferenceNumber;
 use App\Services\Tracker;
+use App\Support\DataTableResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class IncomingController extends Controller
 {
+    /** Register page; the table itself is filled by the DataTables request (see rows()). */
     public function index(Request $request)
     {
-        $records = IncomingCommunication::query()
-            ->search($request->input('q'))
+        if ($request->has('draw')) {
+            return $this->rows($request);
+        }
+
+        return view('incoming.index');
+    }
+
+    private function rows(Request $request)
+    {
+        $query = IncomingCommunication::query()
             ->when($request->input('status') === 'pending', fn ($q) => $q->pending())
             ->when($request->input('status') && $request->input('status') !== 'pending', fn ($q) => $q->where('status', $request->input('status')))
             ->when($request->input('sensitivity'), fn ($q, $s) => $q->where('sensitivity', $s))
             ->when($request->input('from'), fn ($q, $d) => $q->whereDate('received_at', '>=', $d))
             ->when($request->input('to'), fn ($q, $d) => $q->whereDate('received_at', '<=', $d))
-            ->when($request->boolean('overdue'), fn ($q) => $q->pending()->whereNotNull('action_due_at')->where('action_due_at', '<', now()))
-            ->with('registrar')
-            ->latest('received_at')->latest('id')
-            ->paginate(25)->withQueryString();
+            ->when($request->boolean('overdue'), fn ($q) => $q->pending()->whereNotNull('action_due_at')->where('action_due_at', '<', now()));
 
-        return view('incoming.index', compact('records'));
+        return DataTableResponse::make(
+            $request,
+            $query,
+            [0 => 'reference_no', 1 => 'received_at', 2 => 'sender_name', 3 => 'subject', 4 => 'routed_to', 5 => 'status'],
+            fn ($q, $term) => $q->search($term),
+            function (IncomingCommunication $r) {
+                $view = view('incoming._row', ['r' => $r]);
+
+                return [
+                    'cells' => array_map(fn ($cell) => $view->fragment($cell), ['reference', 'received', 'sender', 'subject', 'routed', 'status']),
+                    'href' => route('incoming.show', $r),
+                ];
+            },
+        );
     }
 
     public function create()
@@ -41,7 +61,7 @@ class IncomingController extends Controller
     public function store(Request $request)
     {
         $request->merge(['requires_action' => $request->boolean('requires_action')]);
-        $data = $request->validate($this->rules() + $this->attachmentRules());
+        $data = $request->validateWithBag('incoming', $this->rules() + $this->attachmentRules());
         $user = $request->user();
 
         $record = DB::transaction(function () use ($data, $user, $request) {

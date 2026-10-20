@@ -3,19 +3,22 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TestEmail;
 use App\Models\User;
 use App\Services\Audit;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\TestEmail;
+use Illuminate\Validation\Rule;
 
 /** Accounts are never deleted (records stay linked to them); they are deactivated instead. */
 class UserController extends Controller
 {
     public function index()
     {
-        return view('admin.users.index', ['users' => User::orderByDesc('is_active')->orderBy('name')->get()]);
+        return view('admin.users.index', [
+            'users' => User::orderByDesc('is_active')->orderBy('last_name')->orderBy('first_name')->get(),
+            'newUser' => new User(['is_active' => true]),
+        ]);
     }
 
     public function create()
@@ -23,52 +26,29 @@ class UserController extends Controller
         return view('admin.users.form', ['user' => new User(['is_active' => true])]);
     }
 
-
-
     public function store(Request $request)
     {
-        $data = $request->validate(
-            $this->rules() + [
-                'password' => ['required', 'confirmed', 'min:8'],
-            ]
-        );
-
+        $data = $request->validateWithBag('user', $this->rules() + [
+            'password' => ['required', 'confirmed', 'min:8'],
+        ]);
         $data['is_active'] = $request->boolean('is_active');
 
-        // Create user account
         $user = User::create($data);
 
-        // Record audit log
-        Audit::log(
-            'user.created',
-            $user,
-            'Created account ' . $user->username,
-            null,
-            collect($data)
-                ->except('password', 'password_confirmation')
-                ->all()
-        );
+        Audit::log('user.created', $user, 'Created account '.$user->username, null,
+            collect($data)->except('password', 'password_confirmation')->all());
 
-        // Send formal account creation email
-        try {
-            Mail::to($user->email)->send(
-                new TestEmail(
-                    username: $user->username,
-                    loginUrl: route('login')
-                )
-            );
-        } catch (\Throwable $e) {
-            // Log email errors without cancelling account creation
-            report($e);
+        // Send the account creation notice when an e-mail address was given.
+        // A mail failure never cancels the account creation.
+        if ($user->email) {
+            try {
+                Mail::to($user->email)->send(new TestEmail(username: $user->username, loginUrl: route('login')));
+            } catch (\Throwable $e) {
+                report($e);
+            }
         }
 
-        // Redirect after account creation
-        return redirect()
-            ->route('admin.users.index')
-            ->with(
-                'success',
-                'Account created for ' . $user->displayName() . '.'
-            );
+        return redirect()->route('admin.users.index')->with('success', 'Account created for '.$user->displayName().'.');
     }
 
     public function edit(User $user)
@@ -94,7 +74,7 @@ class UserController extends Controller
         $passwordChanged = $user->isDirty('password');
         $user->save();
 
-        Audit::log('user.updated', $user, 'Updated account ' . $user->username . ($passwordChanged ? ' (password reset)' : ''), $old, $changes);
+        Audit::log('user.updated', $user, 'Updated account '.$user->username.($passwordChanged ? ' (password reset)' : ''), $old, $changes);
 
         return redirect()->route('admin.users.index')->with('success', 'Account updated.');
     }
@@ -102,8 +82,10 @@ class UserController extends Controller
     private function rules(?User $user = null): array
     {
         return [
-            'rank' => ['required', 'string', 'max:50'],
-            'name' => ['required', 'string', 'max:255'],
+            'rank' => ['required', Rule::in(array_keys(User::ranks()))],
+            'first_name' => ['required', 'string', 'max:100'],
+            'middle_initial' => ['nullable', 'string', 'max:2', 'regex:/^[A-Za-z]\.?$/'],
+            'last_name' => ['required', 'string', 'max:100'],
             'serial_number' => ['required', 'string', 'max:50'],
             'designation' => ['nullable', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:50', 'alpha_dash', Rule::unique('users')->ignore($user)],
